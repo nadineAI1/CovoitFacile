@@ -1,0 +1,26 @@
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './src/firebase';
+import MainStack from './src/navigation';
+
+export default function App() {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (initializing) setInitializing(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  if (initializing) return null;
+
+  return (
+    <NavigationContainer>
+      <MainStack user={user} />
+    </NavigationContainer>
+  );
+}

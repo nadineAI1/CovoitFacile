@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "CovoitFacile",
+    "slug": "covoit-facile",
+    "version": "1.0.0",
+    "platforms": ["ios","android","web"],
+    "orientation": "portrait",
+    "sdkVersion": "54.0.0",
+    "ios": {
+      "config": {
+        "googleMapsApiKey": "YOUR_IOS_KEY"
+      }
+    },
+    "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_ANDROID_KEY"
+        }
+      }
+    }
+  }
+}
