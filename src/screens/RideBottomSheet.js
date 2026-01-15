@@ -1,39 +1,35 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Colors, Layout } from '../theme';
-import { useNavigation } from '@react-navigation/native';
+import { Colors } from '../theme';
 
-export default function RideBottomSheet() {
-  const navigation = useNavigation();
 
+export default function RideBottomSheet({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Où voulez-vous aller ?</Text>
+      <Text style={styles.title}>Options rapides</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>De</Text>
-        <Text style={styles.location}>Campus - Entrée principale</Text>
+      <TouchableOpacity style={styles.row} onPress={() => navigation.navigate('CreateRide')}>
+        <Text style={styles.rowText}>Proposer un trajet</Text>
+      </TouchableOpacity>
 
-        <Text style={[styles.label, { marginTop: 12 }]}>À</Text>
-        <Text style={styles.location}>Bibliothèque centrale</Text>
+      <TouchableOpacity style={styles.row} onPress={() => navigation.navigate('Home')}>
+        <Text style={styles.rowText}>Voir les trajets disponibles</Text>
+      </TouchableOpacity>
 
-        <Text style={styles.price}>Estimation : $2.50</Text>
-
-        <TouchableOpacity style={styles.requestBtn} onPress={() => navigation.navigate('CreateRide')}>
-          <Text style={styles.requestText}>Demander une prise en charge</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.row}>
+        <Text style={styles.rowText}>Partager ma position</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: Layout.padding / 2, flex: 1 },
-  title: { fontSize: 16, fontWeight: '700', textAlign: 'center', marginBottom: 8 },
-  card: { backgroundColor: Colors.white, borderRadius: Layout.cardRadius, padding: Layout.padding, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 4 },
-  label: { color: Colors.muted, fontSize: 12 },
-  location: { fontSize: 16, color: Colors.text, fontWeight: '600' },
-  price: { marginTop: 8, fontSize: 18, fontWeight: '700', color: Colors.primary },
-  requestBtn: { marginTop: 14, backgroundColor: Colors.primary, padding: 12, borderRadius: 12, alignItems: 'center' },
-  requestText: { color: Colors.white, fontWeight: '700' },
+  container: { padding: 16 },
+  title: { fontSize: 16, fontWeight: '700', marginBottom: 12 },
+  row: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  rowText: { color: Colors.primary, fontWeight: '700' },
 });

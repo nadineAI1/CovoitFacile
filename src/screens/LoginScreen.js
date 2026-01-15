@@ -1,58 +1,70 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { Colors, Layout } from '../theme';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
+import { getUserProfile } from '../services/firestore';
+import { Colors } from '../theme';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation, route }) {
+
+  const roleProp = route?.params?.role || route?.role || null;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  async function handleRegister() {
+  const onLogin = async () => {
+    if (!email || !password) return Alert.alert('Erreur', 'Email et mot de passe requis');
     try {
-      const uc = await createUserWithEmailAndPassword(auth, email, password);
-      console.log('Utilisateur créé', uc.user.uid);
+      setLoading(true);
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      const u = res.user;
+      const profile = await getUserProfile(u.uid);
+      if (!profile) {
+        await auth.signOut();
+        return Alert.alert('Compte incomplet', 'Ton profil est introuvable.');
+      }
+      
+      if (roleProp && profile.role !== roleProp) {
+        await auth.signOut();
+        return Alert.alert('Mauvais rôle', `Ce compte est enregistré comme "${profile.role}". Utilise la section correspondante.`);
+      }
+    
+      const target = profile.role === 'driver' ? 'Driver' : 'Student';
+      navigation.reset({ index:0, routes:[{ name: target }] });
     } catch (e) {
-      alert(e.message);
+      Alert.alert('Erreur connexion', e.message || String(e));
+    } finally {
+      setLoading(false);
     }
-  }
-
-  async function handleLogin() {
-    try {
-      const uc = await signInWithEmailAndPassword(auth, email, password);
-      console.log('Connected', uc.user.uid);
-    } catch (e) {
-      alert(e.message);
-    }
-  }
+  };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={styles.inner}>
-        <Text style={styles.title}>Welcome back</Text>
-        <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" autoCapitalize="none" />
-        <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry style={styles.input} />
-        <TouchableOpacity style={styles.primaryBtn} onPress={handleLogin}>
-          <Text style={styles.primaryText}>Login</Text>
+    <SafeAreaView style={styles.page}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Connexion</Text>
+        <TextInput placeholder="Email" keyboardType="email-address" autoCapitalize="none" style={styles.input} value={email} onChangeText={setEmail} />
+        <TextInput placeholder="Mot de passe" secureTextEntry style={styles.input} value={password} onChangeText={setPassword} />
+        <TouchableOpacity style={styles.btn} onPress={onLogin} disabled={loading}>
+          <Text style={styles.btnText}>{loading ? 'Connexion...' : 'Se connecter'}</Text>
         </TouchableOpacity>
 
-        <View style={styles.row}>
-          <Text>Don't have an account?</Text>
-          <TouchableOpacity onPress={handleRegister}>
-            <Text style={{ color: Colors.primary, marginLeft: 8 }}>Register</Text>
+        <View style={{flexDirection:'row', justifyContent:'center', marginTop:12}}>
+          <Text>Pas de compte ? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Register', { role: roleProp || 'student' })}>
+            <Text style={{color: Colors.primary, fontWeight:'700'}}>S'inscrire</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.soft, justifyContent: 'center' },
-  inner: { margin: Layout.padding, backgroundColor: Colors.white, borderRadius: Layout.cardRadius, padding: Layout.padding + 6 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 12 },
-  input: { backgroundColor: '#f6f8f6', padding: 12, borderRadius: 12, marginBottom: 10 },
-  primaryBtn: { backgroundColor: Colors.primary, padding: 14, borderRadius: 12, alignItems: 'center', marginTop: 6 },
-  primaryText: { color: Colors.white, fontWeight: '700' },
-  row: { flexDirection: 'row', justifyContent: 'center', marginTop: 12 },
+  page: { flex:1, backgroundColor: Colors.background },
+  container: { padding:20, marginTop: Platform.OS==='ios' ? 40 : 20 },
+  title: { fontSize:22, fontWeight:'800', color: Colors.primary, marginBottom:12 },
+  input: { backgroundColor:'#fff', padding:12, borderRadius:8, borderWidth:1, borderColor:'#eee', marginBottom:10 },
+  btn: { backgroundColor: Colors.primary, paddingVertical:14, borderRadius:10, alignItems:'center' },
+  btnText: { color:'#fff', fontWeight:'700' }
 });

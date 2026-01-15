@@ -3,7 +3,11 @@
     "name": "CovoitFacile",
     "slug": "covoit-facile",
     "version": "1.0.0",
-    "platforms": ["ios","android","web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "orientation": "portrait",
     "sdkVersion": "54.0.0",
     "ios": {
@@ -16,7 +20,16 @@
         "googleMaps": {
           "apiKey": "YOUR_ANDROID_KEY"
         }
+      },
+      "package": "com.ianadine2004.covoitfacile"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3e7d28c3-0dc2-4a59-9345-114e661b7c7e"
       }
-    }
+    },
+    "plugins": [
+      "@react-native-community/datetimepicker"
+    ]
   }
 }

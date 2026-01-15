@@ -1,16 +1,13 @@
+// simple theme file used par les écrans (couleurs)
 export const Colors = {
-  primary: '#1FA65A',
-  primaryDark: '#12803F',
-  soft: '#F2FBF5',
-  white: '#FFFFFF',
-  text: '#12323A',
-  muted: '#8EA69A',
-  overlay: 'rgba(0,0,0,0.05)',
+  primary: '#0f6b73', // teal foncé
+  background: '#f6f8f9',
+  text: '#0b2b2c',
+  muted: '#9aa4a6',
 };
 
-export const Layout = {
-  borderRadius: 14,
-  cardRadius: 18,
+export const Metrics = {
+  cardRadius: 12,
   padding: 16,
-  gutter: 12,
 };
+export default { Colors, Metrics };
